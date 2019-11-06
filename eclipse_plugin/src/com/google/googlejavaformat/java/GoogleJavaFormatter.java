@@ -14,20 +14,23 @@
 
 package com.google.googlejavaformat.java;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Range;
-import com.google.googlejavaformat.java.SnippetFormatter.SnippetKind;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.googlejavaformat.Activator;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
+import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
-/** Runs the Google Java formatter on the given code. */
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Range;
+import com.google.googlejavaformat.java.SnippetFormatter.SnippetKind;
+
 public class GoogleJavaFormatter extends CodeFormatter {
 
   private static final int INDENTATION_SIZE = 2;
@@ -82,6 +85,7 @@ public class GoogleJavaFormatter extends CodeFormatter {
         default:
           throw new IllegalArgumentException(String.format("Unknown snippet kind: %d", kind));
       }
+
       List<Replacement> replacements =
           new SnippetFormatter()
               .format(
@@ -90,9 +94,11 @@ public class GoogleJavaFormatter extends CodeFormatter {
         // Do not create edits if there's no diff.
         return null;
       }
+
       // Convert replacements to text edits.
       return editFromReplacements(replacements);
     } catch (IllegalArgumentException | FormatterException exception) {
+      Activator.logError(exception);
       // Do not format on errors.
       return null;
     }
@@ -106,17 +112,22 @@ public class GoogleJavaFormatter extends CodeFormatter {
     return ranges;
   }
 
-  /** @return {@code true} if input and output texts are equal, else {@code false}. */
-  private boolean idempotent(String source, IRegion[] regions, List<Replacement> replacements) {
+  /**
+   * @return {@code true} if input and output texts are equal, else {@code false}.
+   * @throws FormatterException
+   */
+  private boolean idempotent(String source, IRegion[] regions, List<Replacement> replacements)
+      throws FormatterException {
     // This implementation only checks for single replacement.
     if (replacements.size() == 1) {
       Replacement replacement = replacements.get(0);
-      String output = replacement.getReplacementString();
+      String output = organizeImports(replacement.getReplacementString());
       // Entire source case: input = output, nothing changed.
       if (output.equals(source)) {
         return true;
       }
-      // Single region and single replacement case: if they are equal, nothing changed.
+      // Single region and single replacement case: if they are equal, nothing
+      // changed.
       if (regions.length == 1) {
         Range<Integer> range = replacement.getReplaceRange();
         String snippet = source.substring(range.lowerEndpoint(), range.upperEndpoint());
@@ -133,12 +144,24 @@ public class GoogleJavaFormatter extends CodeFormatter {
     TextEdit edit = new MultiTextEdit();
     for (Replacement replacement : replacements) {
       Range<Integer> replaceRange = replacement.getReplaceRange();
-      edit.addChild(
-          new ReplaceEdit(
-              replaceRange.lowerEndpoint(),
-              replaceRange.upperEndpoint() - replaceRange.lowerEndpoint(),
-              replacement.getReplacementString()));
+
+      try {
+        String replacementString = organizeImports(replacement.getReplacementString());
+        edit.addChild(
+            new ReplaceEdit(
+                replaceRange.lowerEndpoint(),
+                replaceRange.upperEndpoint() - replaceRange.lowerEndpoint(),
+                replacementString));
+      } catch (MalformedTreeException | FormatterException exception) {
+        Activator.logError(exception);
+      }
     }
     return edit;
+  }
+
+  private String organizeImports(String replacementString) throws FormatterException {
+      replacementString = RemoveUnusedImports.removeUnusedImports(replacementString);
+      replacementString = ImportOrderer.reorderImports(replacementString);
+    return replacementString;
   }
 }

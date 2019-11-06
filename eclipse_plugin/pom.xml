@@ -20,27 +20,27 @@
   <parent>
     <groupId>com.google.googlejavaformat</groupId>
     <artifactId>google-java-format-parent</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
   </parent>
 
   <artifactId>google-java-format-eclipse-plugin</artifactId>
-  <version>1.6.0</version>
+  <version>1.7.1</version>
   <packaging>eclipse-plugin</packaging>
-  <name>google-java-format Plugin for Eclipse 4.5+</name>
+  <name>google-java-format Plugin for Eclipse 4.13+</name>
 
   <description>
     A Java source code formatter that follows Google Java Style.
   </description>
 
   <properties>
-    <tycho-version>0.26.0</tycho-version>
+    <tycho-version>1.4.0</tycho-version>
   </properties>
 
   <repositories>
     <repository>
-      <id>mars</id>
+      <id>2019-09</id>
       <layout>p2</layout>
-      <url>https://download.eclipse.org/releases/mars</url>
+      <url>https://download.eclipse.org/releases/2019-09</url>
     </repository>
   </repositories>
 
@@ -48,7 +48,7 @@
     <dependency>
       <groupId>com.google.googlejavaformat</groupId>
       <artifactId>google-java-format</artifactId>
-      <version>1.6</version>
+      <version>1.7</version>
     </dependency>
   </dependencies>
 
