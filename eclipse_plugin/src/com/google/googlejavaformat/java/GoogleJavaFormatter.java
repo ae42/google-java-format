@@ -14,9 +14,11 @@
 
 package com.google.googlejavaformat.java;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Range;
+import com.google.googlejavaformat.java.SnippetFormatter.SnippetKind;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.googlejavaformat.Activator;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
@@ -26,10 +28,6 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Range;
-import com.google.googlejavaformat.java.SnippetFormatter.SnippetKind;
 
 public class GoogleJavaFormatter extends CodeFormatter {
 
@@ -160,8 +158,8 @@ public class GoogleJavaFormatter extends CodeFormatter {
   }
 
   private String organizeImports(String replacementString) throws FormatterException {
-      replacementString = RemoveUnusedImports.removeUnusedImports(replacementString);
-      replacementString = ImportOrderer.reorderImports(replacementString);
+    replacementString = RemoveUnusedImports.removeUnusedImports(replacementString);
+    replacementString = ImportOrderer.reorderImports(replacementString);
     return replacementString;
   }
 }

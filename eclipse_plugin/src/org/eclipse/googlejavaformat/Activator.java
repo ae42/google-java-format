@@ -31,15 +31,15 @@ public class Activator extends AbstractUIPlugin {
 
   /**
    * Displays the specified error in the ErrorLog-view.
-   * 
+   *
    * @param throwable
    */
   public static void logError(Throwable throwable) {
-	  log(Status.ERROR, "An error occurred while formatting the source code", throwable);
+    log(Status.ERROR, "An error occurred while formatting the source code", throwable);
   }
   /**
    * Displays the specified message in the ErrorLog-view.
-   * 
+   *
    * @param message
    */
   public static void logInfo(String message) {
@@ -49,8 +49,6 @@ public class Activator extends AbstractUIPlugin {
   private static void log(int status, String message, Throwable throwable) {
     getDefault()
         .getLog()
-        .log(
-            new OperationStatus(
-                status, Activator.PLUGIN_ID, Status.OK, message, throwable));
+        .log(new OperationStatus(status, Activator.PLUGIN_ID, Status.OK, message, throwable));
   }
 }
