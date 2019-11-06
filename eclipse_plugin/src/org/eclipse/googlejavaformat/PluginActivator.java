@@ -5,13 +5,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-public class Activator extends AbstractUIPlugin {
+public class PluginActivator extends AbstractUIPlugin {
 
   public static final String PLUGIN_ID = "google-java-format-eclipse-plugin";
 
-  private static Activator plugin;
+  private static PluginActivator plugin;
 
-  public Activator() {}
+  public PluginActivator() {}
 
   @Override
   public void start(BundleContext context) throws Exception {
@@ -25,7 +25,7 @@ public class Activator extends AbstractUIPlugin {
     super.stop(context);
   }
 
-  public static Activator getDefault() {
+  public static PluginActivator getDefault() {
     return plugin;
   }
 
@@ -49,6 +49,6 @@ public class Activator extends AbstractUIPlugin {
   private static void log(int status, String message, Throwable throwable) {
     getDefault()
         .getLog()
-        .log(new OperationStatus(status, Activator.PLUGIN_ID, Status.OK, message, throwable));
+        .log(new OperationStatus(status, PluginActivator.PLUGIN_ID, Status.OK, message, throwable));
   }
 }

@@ -15,4 +15,4 @@ Bundle-ClassPath: .,
  lib/javac-shaded-9+181-r4173-1.jar,
  lib/google-java-format-1.7.jar
 Bundle-ActivationPolicy: lazy
-Bundle-Activator: org.eclipse.googlejavaformat.Activator
+Bundle-Activator: org.eclipse.googlejavaformat.PluginActivator

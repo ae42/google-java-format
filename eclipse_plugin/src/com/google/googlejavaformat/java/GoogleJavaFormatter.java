@@ -19,7 +19,7 @@ import com.google.common.collect.Range;
 import com.google.googlejavaformat.java.SnippetFormatter.SnippetKind;
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.googlejavaformat.Activator;
+import org.eclipse.googlejavaformat.PluginActivator;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.IRegion;
@@ -29,6 +29,7 @@ import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
+/** Runs the Google Java formatter on the given code. */
 public class GoogleJavaFormatter extends CodeFormatter {
 
   private static final int INDENTATION_SIZE = 2;
@@ -96,7 +97,7 @@ public class GoogleJavaFormatter extends CodeFormatter {
       // Convert replacements to text edits.
       return editFromReplacements(replacements);
     } catch (IllegalArgumentException | FormatterException exception) {
-      Activator.logError(exception);
+      PluginActivator.logError(exception);
       // Do not format on errors.
       return null;
     }
@@ -151,7 +152,7 @@ public class GoogleJavaFormatter extends CodeFormatter {
                 replaceRange.upperEndpoint() - replaceRange.lowerEndpoint(),
                 replacementString));
       } catch (MalformedTreeException | FormatterException exception) {
-        Activator.logError(exception);
+        PluginActivator.logError(exception);
       }
     }
     return edit;
