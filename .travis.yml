@@ -8,10 +8,8 @@ notifications:
     on_failure: always
 
 jdk:
-  - openjdk8
-  - openjdk9
-  - openjdk10
   - openjdk11
+  - openjdk14
   - openjdk-ea
 
 matrix:

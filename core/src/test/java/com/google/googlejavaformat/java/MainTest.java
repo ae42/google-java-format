@@ -294,7 +294,7 @@ public class MainTest {
               new PrintWriter(err, true),
               new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8)));
       assertThat(main.format("-")).isEqualTo(1);
-      assertThat(err.toString()).contains("<stdin>:4:3: error: class, interface, or enum expected");
+      assertThat(err.toString()).contains("<stdin>:4:3: error: class, interface");
 
     } finally {
       Locale.setDefault(backupLocale);
@@ -491,7 +491,7 @@ public class MainTest {
             new PrintWriter(err, true),
             new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8)));
     assertThat(main.format("--assume-filename=Foo.java", "-")).isEqualTo(1);
-    assertThat(err.toString()).contains("Foo.java:1:15: error: class, interface, or enum expected");
+    assertThat(err.toString()).contains("Foo.java:1:15: error: class, interface");
   }
 
   @Test
@@ -564,5 +564,35 @@ public class MainTest {
             in);
     assertThat(main.format("--skip-reflowing-long-strings", "-")).isEqualTo(0);
     assertThat(out.toString()).isEqualTo(joiner.join(expected));
+  }
+
+  @Test
+  public void noFormatJavadoc() throws Exception {
+    String[] input = {
+      "/**",
+      " * graph",
+      " *",
+      " * graph",
+      " *",
+      " * @param foo lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do"
+          + " eiusmod tempor incididunt ut labore et dolore magna aliqua",
+      " */",
+      "class Test {",
+      "  /**",
+      "   * creates entropy",
+      "   */",
+      "  public static void main(String... args) {}",
+      "}",
+      "",
+    };
+    InputStream in = new ByteArrayInputStream(joiner.join(input).getBytes(UTF_8));
+    StringWriter out = new StringWriter();
+    Main main =
+        new Main(
+            new PrintWriter(out, true),
+            new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.err, UTF_8)), true),
+            in);
+    assertThat(main.format("--skip-javadoc-formatting", "-")).isEqualTo(0);
+    assertThat(out.toString()).isEqualTo(joiner.join(input));
   }
 }
