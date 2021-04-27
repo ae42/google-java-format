@@ -16,10 +16,11 @@ package com.google.googlejavaformat.java;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Range;
+import com.google.googlejavaformat.java.JavaFormatterOptions.Style;
 import com.google.googlejavaformat.java.SnippetFormatter.SnippetKind;
 import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.googlejavaformat.PluginActivator;
+import org.eclipse.googlejavaformat.GoogleFormatterActivator;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.IRegion;
@@ -97,7 +98,7 @@ public class GoogleJavaFormatter extends CodeFormatter {
       // Convert replacements to text edits.
       return editFromReplacements(replacements);
     } catch (IllegalArgumentException | FormatterException exception) {
-      PluginActivator.logError(exception);
+      GoogleFormatterActivator.logError(exception);
       // Do not format on errors.
       return null;
     }
@@ -152,7 +153,7 @@ public class GoogleJavaFormatter extends CodeFormatter {
                 replaceRange.upperEndpoint() - replaceRange.lowerEndpoint(),
                 replacementString));
       } catch (MalformedTreeException | FormatterException exception) {
-        PluginActivator.logError(exception);
+        GoogleFormatterActivator.logError(exception);
       }
     }
     return edit;
@@ -160,7 +161,7 @@ public class GoogleJavaFormatter extends CodeFormatter {
 
   private String organizeImports(String replacementString) throws FormatterException {
     replacementString = RemoveUnusedImports.removeUnusedImports(replacementString);
-    replacementString = ImportOrderer.reorderImports(replacementString);
+    replacementString = ImportOrderer.reorderImports(replacementString, Style.GOOGLE);
     return replacementString;
   }
 }
