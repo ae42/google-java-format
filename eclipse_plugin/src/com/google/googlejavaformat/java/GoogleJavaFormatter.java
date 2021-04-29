@@ -21,6 +21,7 @@ import com.google.googlejavaformat.java.SnippetFormatter.SnippetKind;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.googlejavaformat.GoogleFormatterActivator;
+import org.eclipse.googlejavaformat.PreferenceConstants;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.IRegion;
@@ -160,8 +161,16 @@ public class GoogleJavaFormatter extends CodeFormatter {
   }
 
   private String organizeImports(String replacementString) throws FormatterException {
-    replacementString = RemoveUnusedImports.removeUnusedImports(replacementString);
-    replacementString = ImportOrderer.reorderImports(replacementString, Style.GOOGLE);
+    if (GoogleFormatterActivator.getDefault()
+        .getPreferenceStore()
+        .getBoolean(PreferenceConstants.P_REMOVE_UNUSED_IMPORTS)) {
+      replacementString = RemoveUnusedImports.removeUnusedImports(replacementString);
+    }
+    if (GoogleFormatterActivator.getDefault()
+        .getPreferenceStore()
+        .getBoolean(PreferenceConstants.P_ORGANIZE_IMPORTS)) {
+      replacementString = ImportOrderer.reorderImports(replacementString, Style.GOOGLE);
+    }
     return replacementString;
   }
 }

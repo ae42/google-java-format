@@ -34,7 +34,5 @@ public class GoogleFormatterPreferencePage extends FieldEditorPreferencePage
     addField(removeUnusedImports);
   }
 
-  public void init(IWorkbench workbench) {
-    System.err.println("");
-  }
+  public void init(IWorkbench workbench) {}
 }
