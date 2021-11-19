@@ -139,7 +139,6 @@ import com.sun.tools.javac.tree.TreeScanner;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -1600,16 +1599,20 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
   public Void visitLiteral(LiteralTree node, Void unused) {
     sync(node);
     String sourceForNode = getSourceForNode(node, getCurrentPath());
-    // A negative numeric literal -n is usually represented as unary minus on n,
-    // but that doesn't work for integer or long MIN_VALUE. The parser works
-    // around that by representing it directly as a signed literal (with no
-    // unary minus), but the lexer still expects two tokens.
-    if (sourceForNode.startsWith("-")) {
+    if (isUnaryMinusLiteral(sourceForNode)) {
       token("-");
       sourceForNode = sourceForNode.substring(1).trim();
     }
     token(sourceForNode);
     return null;
+  }
+
+  // A negative numeric literal -n is usually represented as unary minus on n,
+  // but that doesn't work for integer or long MIN_VALUE. The parser works
+  // around that by representing it directly as a signed literal (with no
+  // unary minus), but the lexer still expects two tokens.
+  private static boolean isUnaryMinusLiteral(String literalTreeSource) {
+    return literalTreeSource.startsWith("-");
   }
 
   private void visitPackage(
@@ -1697,10 +1700,10 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
       default:
         return false;
     }
-    if (!(node.getExpression() instanceof UnaryTree)) {
+    JCTree.Tag tag = unaryTag(node.getExpression());
+    if (tag == null) {
       return false;
     }
-    JCTree.Tag tag = ((JCTree) node.getExpression()).getTag();
     if (tag.isPostUnaryOp()) {
       return false;
     }
@@ -1708,6 +1711,17 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
       return false;
     }
     return true;
+  }
+
+  private JCTree.Tag unaryTag(ExpressionTree expression) {
+    if (expression instanceof UnaryTree) {
+      return ((JCTree) expression).getTag();
+    }
+    if (expression instanceof LiteralTree
+        && isUnaryMinusLiteral(getSourceForNode(expression, getCurrentPath()))) {
+      return JCTree.Tag.MINUS;
+    }
+    return null;
   }
 
   @Override
@@ -2366,7 +2380,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     builder.open(ZERO);
     boolean first = true;
     if (receiver.isPresent()) {
-      // TODO(jdd): Use builders.
+      // TODO(user): Use builders.
       declareOne(
           DeclarationKind.PARAMETER,
           Direction.HORIZONTAL,
@@ -2906,7 +2920,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
         if (!methodInvocation.getTypeArguments().isEmpty()) {
           builder.open(plusFour);
           addTypeArguments(methodInvocation.getTypeArguments(), ZERO);
-          // TODO(jdd): Should indent the name -4.
+          // TODO(user): Should indent the name -4.
           builder.breakOp(Doc.FillMode.UNIFIED, "", ZERO, tyargTag);
           builder.close();
         }
@@ -3270,8 +3284,7 @@ public class JavaInputAstVisitor extends TreePathScanner<Void, Void> {
     }
 
     Deque<List<? extends AnnotationTree>> dims =
-        new ArrayDeque<>(
-            typeWithDims.isPresent() ? typeWithDims.get().dims : Collections.emptyList());
+        new ArrayDeque<>(typeWithDims.isPresent() ? typeWithDims.get().dims : ImmutableList.of());
     int baseDims = 0;
 
     builder.open(
