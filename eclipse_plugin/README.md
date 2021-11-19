@@ -64,4 +64,4 @@ The created plugin `google-java-format-eclipse-plugin-x.x.x.jar` is placed in th
 ### Building plugin using Eclipse
 As an alternative to building with Tycho, the plugin can be exported directly from the Eclipse Plugin Project.. Open the `eclipse_plugin` project in a recent Eclipse SDK build. From `File > Export` select `Plugin-in Development > Deployable plugin-ins and fragments` and follow the wizard to export a plugin jar.
 
-This was tested with Eclipse Version 2021-03 (4.19.0).
+This was tested with Eclipse Version 2021-09 (4.21.0).
